@@ -2,6 +2,15 @@ import { isEscKey } from './util.js';
 import './filter-change.js';
 import { showNotificationMessage } from './result-message-form.js';
 import { sendData } from './api.js';
+import { updateScale } from './scale-change.js';
+import { resetEffects } from './filter-change.js';
+
+const HASHTAG_UNVALID = /[^\w\u0400-\u04FF]/;
+const FILE_TYPES = ['jpg', 'jpeg', 'png'];
+const MIN_HASHTAG_LENGTH = 2;
+const MAX_HASHTAG_LENGTH = 20;
+const MAX_HASHTAG_COUNT = 5;
+const MAX_COMMENT_LENGTH = 140;
 
 const body = document.querySelector('body');
 const form = document.querySelector('.img-upload__form');
@@ -16,14 +25,6 @@ const submitButton = form.querySelector('.img-upload__submit');
 const photoPreview = form.querySelector('.img-upload__preview img');
 const effectsPreview = form.querySelectorAll('.effects__preview');
 
-
-const HASHTAG_UNVALID = /[^\w\u0400-\u04FF]/;
-const FILE_TYPES = ['jpg', 'jpeg', 'png'];
-const MIN_HASHTAG_LENGTH = 2;
-const MAX_HASHTAG_LENGTH = 20;
-const MAX_HASHTAG_COUNT = 5;
-const MAX_COMMENT_LENGTH = 140;
-
 const pristine = new Pristine(form, {
   classTo: 'img-upload__field-wrapper',
   errorTextParent: 'img-upload__field-wrapper',
@@ -33,6 +34,9 @@ const pristine = new Pristine(form, {
 const showOverlay = () => {
   overlay.classList.remove('hidden');
   body.classList.add('modal-open');
+
+  updateScale(100);
+  resetEffects();
 
   document.addEventListener('keydown', onEscKeydown);
 };
@@ -49,10 +53,10 @@ const resetForm = () => {
   pristine.reset();
 };
 
-const textFieldActive = () => document.activeElement === hashtagField || document.activeElement === descriptionField;
+const checkTextFieldActive = () => document.activeElement === hashtagField || document.activeElement === descriptionField;
 
 function onEscKeydown(evt) {
-  if (isEscKey(evt) && !textFieldActive()) {
+  if (isEscKey(evt) && !checkTextFieldActive()) {
     evt.preventDefault();
     hideOverlay();
     resetForm();
@@ -79,8 +83,7 @@ const validateHashtags = (value) => {
 pristine.addValidator(
   hashtagField,
   validateHashtags,
-  'Недопустимый хэштег'
-);
+  'Недопустимый хэштег');
 
 const hasValidCommentLength = (string) => string.length <= MAX_COMMENT_LENGTH;
 
@@ -120,7 +123,6 @@ const onFileInputChange = () => {
 };
 
 const setUserFormSubmit = async (forElement) => {
-
   const isValid = pristine.validate();
   if(isValid) {
     blockSubmitButton();

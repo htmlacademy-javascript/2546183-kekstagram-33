@@ -1,8 +1,3 @@
-const effectValue = document.querySelector('.effect-level__value');
-const imagePreview = document.querySelector('.img-upload__preview img');
-const effectLevelContainer = document.querySelector('.img-upload__effect-level');
-const effectLevelSlider = document.querySelector('.effect-level__slider');
-
 const EFFECTS = [
   {
     effectName: 'none',
@@ -60,6 +55,11 @@ const EFFECTS = [
   },
 ];
 
+const effectValue = document.querySelector('.effect-level__value');
+const imagePreview = document.querySelector('.img-upload__preview img');
+const effectLevelContainer = document.querySelector('.img-upload__effect-level');
+const effectLevelSlider = document.querySelector('.effect-level__slider');
+
 noUiSlider.create(effectLevelSlider, {
   range: {
     min: 0,
@@ -77,7 +77,6 @@ noUiSlider.create(effectLevelSlider, {
     },
   },
 });
-
 
 effectLevelSlider.noUiSlider.on('update', () => {
   const value = effectLevelSlider.noUiSlider.get();
@@ -121,5 +120,10 @@ EFFECTS.forEach((effect) => {
     }
   });
 });
+
+export const resetEffects = () => {
+  effectLevelContainer.style.display = 'none';
+  imagePreview.style.filter = '';
+};
 
 effectLevelContainer.style.display = 'none';
